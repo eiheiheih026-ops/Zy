@@ -16,6 +16,7 @@
   --gray:#6d7a70;
 }
 *{box-sizing:border-box;scroll-behavior:smooth}
+html{scroll-behavior:smooth}
 body{
   margin:0;
   font-family:'Inter',Arial,sans-serif;
@@ -26,14 +27,27 @@ body{
     var(--bg);
   color:var(--text);
   letter-spacing:.01em;
+  overflow-x:hidden;
 }
 body:before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:-1;
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:-2;
   background-image:
     linear-gradient(rgba(23,50,38,.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(23,50,38,.035) 1px, transparent 1px);
   background-size:64px 64px;
 }
+/* cursor glow */
+#glow{
+  position:fixed;top:0;left:0;width:420px;height:420px;border-radius:50%;
+  pointer-events:none;z-index:-1;
+  background:radial-gradient(circle, rgba(182,136,63,.12), transparent 70%);
+  transform:translate(-50%,-50%);
+  transition:opacity .4s ease;
+  opacity:0;
+}
+/* scroll progress */
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--primary));z-index:50;width:0%;transition:width .1s linear}
+
 h1,h2{font-family:'Cormorant Garamond',serif;font-weight:600;letter-spacing:.01em;}
 nav{
   position:fixed;top:16px;left:50%;transform:translateX(-50%);
@@ -44,9 +58,10 @@ nav{
   border-radius:4px;
   box-shadow:0 10px 34px rgba(23,50,38,.10);
   z-index:10;
+  transition:box-shadow .3s ease;
 }
 .nav{padding:18px 28px;display:flex;justify-content:space-between;align-items:center}
-.nav strong{font-family:'Cormorant Garamond',serif;font-size:1.35rem;letter-spacing:.04em;color:var(--deep);font-weight:600}
+.nav strong{font-family:'Cormorant Garamond',serif;font-size:1.35rem;letter-spacing:.04em;color:var(--deep);font-weight:600;cursor:default}
 .nav a{
   text-decoration:none;color:var(--text);margin-left:26px;font-size:.82rem;
   letter-spacing:.14em;text-transform:uppercase;font-weight:500;
@@ -55,6 +70,8 @@ nav{
 .nav a:after{content:'';position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--accent);transition:width .35s ease}
 .nav a:hover{color:var(--deep)}
 .nav a:hover:after{width:100%}
+.nav a.active{color:var(--deep)}
+.nav a.active:after{width:100%}
 
 .container{max-width:1100px;margin:auto;padding:130px 24px 60px}
 .hero{display:grid;grid-template-columns:280px 1fr;gap:64px;align-items:center;min-height:78vh}
@@ -65,23 +82,32 @@ nav{
   padding:6px;
   background:conic-gradient(from 180deg, var(--accent), var(--primary), var(--deep), var(--accent));
   box-shadow:0 24px 60px rgba(23,50,38,.28);
+  animation:spin 14s linear infinite;
+  transition:transform .4s ease;
 }
+.photo:hover{transform:scale(1.04)}
+@keyframes spin{to{transform:rotate(360deg)}}
 .photo-inner{
   width:100%;height:100%;border-radius:50%;overflow:hidden;
   background:#e7f0e8;display:flex;align-items:center;justify-content:center;
   border:4px solid var(--bg);
+  animation:spin-reverse 14s linear infinite;
 }
+@keyframes spin-reverse{to{transform:rotate(-360deg)}}
 .photo-inner img{width:100%;height:100%;object-fit:cover}
 .photo-inner div{font-family:'Inter';font-size:.8rem;color:var(--gray);text-align:center;letter-spacing:.05em}
 
 .eyebrow{
   display:inline-block;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;
   color:var(--accent);font-weight:600;margin-bottom:10px;
+  opacity:0;animation:rise .8s ease .1s forwards;
 }
-h1{font-size:3.6rem;margin:0 0 6px;color:var(--deep);line-height:1.05}
-h2{color:var(--primary);font-size:1.5rem;margin:0 0 20px;font-weight:500;font-style:italic}
-.hero p{color:var(--text);line-height:1.75;font-size:1.02rem;max-width:46ch}
+h1{font-size:3.6rem;margin:0 0 6px;color:var(--deep);line-height:1.05;opacity:0;animation:rise .8s ease .25s forwards;}
+h2{color:var(--primary);font-size:1.5rem;margin:0 0 20px;font-weight:500;font-style:italic;opacity:0;animation:rise .8s ease .4s forwards;}
+.hero p{color:var(--text);line-height:1.75;font-size:1.02rem;max-width:46ch;opacity:0;animation:rise .8s ease .55s forwards;}
+.hero p:last-child{animation-delay:.7s}
 @media(max-width:800px){.hero p{margin-inline:auto}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
 .button{
   display:inline-block;padding:14px 34px;margin-top:8px;
@@ -91,13 +117,25 @@ h2{color:var(--primary);font-size:1.5rem;margin:0 0 20px;font-weight:500;font-st
   box-shadow:0 14px 30px rgba(23,50,38,.28);
   border:1px solid rgba(182,136,63,.4);
   transition:transform .3s ease, box-shadow .3s ease;
+  position:relative;overflow:hidden;
 }
 .button:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(23,50,38,.35)}
+.button:after{
+  content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(115deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:skewX(-20deg);
+}
+.button:hover:after{animation:shine .9s ease}
+@keyframes shine{from{left:-60%}to{left:130%}}
 
 section{margin-top:110px;scroll-margin-top:120px;position:relative}
 .section-head{display:flex;align-items:baseline;gap:18px;margin-bottom:34px}
 .section-head h2{margin:0;font-size:2.1rem;color:var(--deep);font-style:normal}
-.section-head:after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.section-head:after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent);transform-origin:left;transform:scaleX(0);transition:transform 1s ease}
+.section-head.in-view:after{transform:scaleX(1)}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease, transform .8s ease}
+.reveal.in-view{opacity:1;transform:translateY(0)}
 
 .card{
   background:var(--card);backdrop-filter:blur(16px);
@@ -116,22 +154,91 @@ section{margin-top:110px;scroll-margin-top:120px;position:relative}
   background:rgba(255,255,255,.55);backdrop-filter:blur(10px);
   padding:20px 18px;border-radius:4px;font-size:.95rem;
   border:1px solid rgba(182,136,63,.25);
-  transition:transform .3s ease, background .3s ease, border-color .3s ease;
+  transition:transform .15s ease, background .3s ease, border-color .3s ease, box-shadow .15s ease;
   letter-spacing:.01em;
+  will-change:transform;
 }
-.skill:hover{transform:translateY(-5px);border-color:var(--accent);background:rgba(255,255,255,.8)}
+.skill:hover{border-color:var(--accent);background:rgba(255,255,255,.82);box-shadow:0 14px 30px rgba(23,50,38,.14)}
 
 footer{text-align:center;padding:50px 24px 40px;color:var(--gray);font-size:.85rem;letter-spacing:.05em}
 footer:before{content:'';display:block;width:60px;height:1px;background:var(--accent);margin:0 auto 20px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
 </style></head><body>
+<div id="glow"></div>
+<div id="progress"></div>
 <nav><div class="nav"><strong>Zhiyu Li</strong><div><a href="#about">About</a><a href="#skills">Skills</a><a href="#background">Background</a><a href="#contact">Contact</a></div></div></nav>
 <div class="container">
 <div class="hero">
 <div class="photo"><div class="photo-inner"><img src="photo.jpg" onerror="this.style.display='none';this.parentNode.innerHTML='<div>Profile Photo<br>photo.jpg</div>'"></div></div>
 <div><span class="eyebrow">Welcome</span><h1>Zhiyu Li</h1><h2>Student · Currently in a Summer Program at Cornell</h2><p>I enjoy learning, exploring new ideas, and finding inspiration in both technology and everyday life.</p><p><a class="button" href="#about">Learn More</a></p></div>
 </div>
-<section id="about"><div class="section-head"><h2>About Me</h2></div><div class="card"><p>I come from China and can communicate comfortably in both Chinese and English. I enjoy exploring unfamiliar ideas, learning from different cultures, and constantly expanding my understanding of the world.</p><p>Outside of learning, I appreciate a peaceful lifestyle. Spending time at home with my one-year-old cat brings me joy, and I believe balancing curiosity with a calm daily life helps me continue growing both personally and academically.</p></div></section>
-<section id="skills"><div class="section-head"><h2>Skills & Interests</h2></div><div class="skills"><div class="skill">📚 High School Studies</div><div class="skill">🎹 Piano</div><div class="skill">🎤 Singing</div><div class="skill">📖 Reading</div><div class="skill">✍️ Story Writing</div><div class="skill">💻 Python & Coding</div></div><div class="card"><p>Learning is my primary focus as a high school student. Music, including piano and singing, gives me a creative outlet, while reading and writing stories strengthen my imagination and communication skills.</p><p>In the future, I hope to develop strong programming skills, especially in Python, and use technology to solve meaningful problems and build useful projects.</p></div></section>
-<section id="background"><div class="section-head"><h2>Activities & Background</h2></div><div class="card"><p>I was born in 2009 and enjoy challenging myself through new educational experiences.</p><p>On July 14, 2026, I attended a summer program at Cornell University, where I learned in an international environment, met students from different backgrounds, and broadened my academic perspective.</p></div></section>
-<section id="contact"><div class="section-head"><h2>Contact</h2></div><div class="card"><p>Email: <a href="mailto:2134313120@qq.com">2134313120@qq.com</a></p></div></section>
-<footer>© 2026 Zhiyu Li</footer></div></body></html>
+<section id="about"><div class="section-head reveal"><h2>About Me</h2></div><div class="card reveal"><p>I come from China and can communicate comfortably in both Chinese and English. I enjoy exploring unfamiliar ideas, learning from different cultures, and constantly expanding my understanding of the world.</p><p>Outside of learning, I appreciate a peaceful lifestyle. Spending time at home with my one-year-old cat brings me joy, and I believe balancing curiosity with a calm daily life helps me continue growing both personally and academically.</p></div></section>
+<section id="skills"><div class="section-head reveal"><h2>Skills & Interests</h2></div><div class="skills"><div class="skill reveal">📚 High School Studies</div><div class="skill reveal">🎹 Piano</div><div class="skill reveal">🎤 Singing</div><div class="skill reveal">📖 Reading</div><div class="skill reveal">✍️ Story Writing</div><div class="skill reveal">💻 Python & Coding</div></div><div class="card reveal"><p>Learning is my primary focus as a high school student. Music, including piano and singing, gives me a creative outlet, while reading and writing stories strengthen my imagination and communication skills.</p><p>In the future, I hope to develop strong programming skills, especially in Python, and use technology to solve meaningful problems and build useful projects.</p></div></section>
+<section id="background"><div class="section-head reveal"><h2>Activities & Background</h2></div><div class="card reveal"><p>I was born in 2009 and enjoy challenging myself through new educational experiences.</p><p>On July 14, 2026, I attended a summer program at Cornell University, where I learned in an international environment, met students from different backgrounds, and broadened my academic perspective.</p></div></section>
+<section id="contact"><div class="section-head reveal"><h2>Contact</h2></div><div class="card reveal"><p>Email: <a href="mailto:2134313120@qq.com">2134313120@qq.com</a></p></div></section>
+<footer>© 2026 Zhiyu Li</footer></div>
+
+<script>
+// cursor glow follow
+const glow = document.getElementById('glow');
+window.addEventListener('mousemove', e=>{
+  glow.style.opacity = 1;
+  glow.style.left = e.clientX + 'px';
+  glow.style.top = e.clientY + 'px';
+});
+window.addEventListener('mouseleave', ()=>{ glow.style.opacity = 0; });
+
+// scroll progress bar
+const progress = document.getElementById('progress');
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  progress.style.width = scrolled + '%';
+});
+
+// reveal on scroll
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('in-view');
+      io.unobserve(entry.target);
+    }
+  });
+},{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// staggered skill reveal
+document.querySelectorAll('.skill.reveal').forEach((el,i)=>{
+  el.style.transitionDelay = (i*0.08)+'s';
+});
+
+// nav active state on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav a');
+const navObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    const id = entry.target.getAttribute('id');
+    const link = document.querySelector('.nav a[href="#'+id+'"]');
+    if(entry.isIntersecting){
+      navLinks.forEach(l=>l.classList.remove('active'));
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-40% 0px -50% 0px'});
+sections.forEach(s=>navObserver.observe(s));
+
+// subtle tilt on skill cards
+document.querySelectorAll('.skill').forEach(card=>{
+  card.addEventListener('mousemove', e=>{
+    const r = card.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width/2;
+    const y = e.clientY - r.top - r.height/2;
+    card.style.transform = `perspective(400px) rotateX(${(-y/10)}deg) rotateY(${(x/10)}deg) translateY(-4px)`;
+  });
+  card.addEventListener('mouseleave', ()=>{ card.style.transform = ''; });
+});
+</script>
+</body></html>
